@@ -7,9 +7,8 @@
 Verantwortlich für die App „Ringrechner“ ist:
 
 **AS-Software**  
-[Vor- und Nachname]  
-[Anschrift]  
-[E-Mail-Adresse]
+Albert Seebold
+albert.seebold@gmail.com
 
 ## 2. Verarbeitung personenbezogener Daten
 
@@ -56,4 +55,4 @@ Die jeweils aktuelle Version dieser Datenschutzerklärung ist über den im Googl
 Bei Fragen zum Datenschutz oder zur App können Sie sich an folgende Adresse wenden:
 
 **AS-Software**  
-E-Mail: [E-Mail-Adresse]
+E-Mail: albert.seebold@gmail.com
