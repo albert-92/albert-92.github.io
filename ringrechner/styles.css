@@ -71,7 +71,7 @@ body {
 }
 
 button, input { font: inherit; }
-button { color: inherit; }
+button { color: inherit; touch-action: manipulation; }
 button:focus-visible, a:focus-visible, input:focus-visible + .switch-track {
   outline: 3px solid var(--primary);
   outline-offset: 3px;
