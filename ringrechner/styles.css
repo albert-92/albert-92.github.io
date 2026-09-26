@@ -59,13 +59,14 @@
   border: 0;
 }
 
-html { min-width: 320px; min-height: 100%; background: var(--page); }
+html { min-width: 320px; min-height: 100%; overscroll-behavior-y: none; background: var(--page); }
 
 body {
   min-width: 320px;
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100svh;
   margin: 0;
+  overscroll-behavior-y: none;
   background: var(--page);
   color: var(--ink);
 }
@@ -362,6 +363,7 @@ button:focus-visible, a:focus-visible, input:focus-visible + .switch-track {
 .reset-button svg { width: 20px; height: 20px; }
 
 .app-dialog {
+  --sheet-drag-offset: 0px;
   width: min(440px, calc(100% - 32px));
   max-width: none;
   margin: auto;
@@ -372,10 +374,13 @@ button:focus-visible, a:focus-visible, input:focus-visible + .switch-track {
   background: var(--surface);
   color: var(--ink);
   box-shadow: 0 20px 60px rgb(0 0 0 / 24%);
+  transition: transform 180ms ease-out;
+  overscroll-behavior-y: contain;
 }
 
 .app-dialog::backdrop { background: rgb(0 0 0 / 42%); }
-.dialog-handle { display: none; width: 34px; height: 4px; margin: 10px auto 0; border-radius: 99px; background: var(--outline-strong); }
+.dialog-handle { display: none; }
+.app-dialog.is-dragging { transform: translateY(var(--sheet-drag-offset)); transition: none; }
 .dialog-content { padding: 22px; }
 .dialog-content h2 { margin: 0; font-size: 1.3rem; font-weight: 750; }
 .dialog-content > p { margin: 10px 0 22px; color: var(--ink-soft); line-height: 1.45; }
@@ -422,9 +427,11 @@ button:focus-visible, a:focus-visible, input:focus-visible + .switch-track {
 }
 
 @media (max-width: 600px) {
-  .app-dialog { position: fixed; inset: auto 0 0; width: 100%; border-radius: 24px 24px 0 0; }
-  .dialog-handle { display: block; }
+  .app-dialog { position: fixed; inset: auto 0 0; width: 100%; max-height: calc(100svh - env(safe-area-inset-top) - 8px); overflow-x: hidden; overflow-y: auto; border-radius: 24px 24px 0 0; -webkit-overflow-scrolling: touch; }
+  .settings-dialog .dialog-handle { display: grid; width: 100%; height: 34px; place-items: center; margin: 0; border-radius: 0; background: transparent; cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none; }
+  .settings-dialog .dialog-handle::before { width: 38px; height: 4px; border-radius: 99px; background: var(--outline-strong); content: ""; }
   .dialog-content { padding: 18px 20px calc(20px + env(safe-area-inset-bottom)); }
+  .settings-dialog .dialog-content { padding-top: 4px; }
   .dialog-actions { justify-content: stretch; }
   .dialog-actions > button { flex: 1; }
 }

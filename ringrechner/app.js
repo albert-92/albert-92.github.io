@@ -8,6 +8,7 @@
   const storageNotice = document.querySelector('#storage-notice');
   const resetDialog = document.querySelector('#reset-dialog');
   const settingsDialog = document.querySelector('#settings-dialog');
+  const settingsHandle = settingsDialog.querySelector('.dialog-handle');
   const hapticsToggle = document.querySelector('#haptics-toggle');
   const hapticsDescription = document.querySelector('#haptics-description');
   const installButton = document.querySelector('#install-app');
@@ -28,6 +29,47 @@
   let installGuideShown = false;
   let appInstalled = false;
   let installPromptPending = false;
+  let settingsDragStartY = null;
+
+  function closeOnBackdrop(dialog) {
+    dialog.addEventListener('click', (event) => {
+      if (event.target !== dialog) return;
+      const bounds = dialog.getBoundingClientRect();
+      const clickedOutside = event.clientX < bounds.left || event.clientX > bounds.right
+        || event.clientY < bounds.top || event.clientY > bounds.bottom;
+      if (clickedOutside) dialog.close();
+    });
+  }
+
+  function clearSettingsDrag() {
+    settingsDragStartY = null;
+    settingsDialog.classList.remove('is-dragging');
+    settingsDialog.style.removeProperty('--sheet-drag-offset');
+  }
+
+  closeOnBackdrop(resetDialog);
+  closeOnBackdrop(settingsDialog);
+
+  settingsHandle.addEventListener('pointerdown', (event) => {
+    if (!settingsDialog.open || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    settingsDragStartY = event.clientY;
+    settingsHandle.setPointerCapture(event.pointerId);
+    settingsDialog.classList.add('is-dragging');
+    event.preventDefault();
+  });
+  settingsHandle.addEventListener('pointermove', (event) => {
+    if (settingsDragStartY === null) return;
+    const dragDistance = Math.max(0, event.clientY - settingsDragStartY);
+    settingsDialog.style.setProperty('--sheet-drag-offset', `${dragDistance}px`);
+  });
+  settingsHandle.addEventListener('pointerup', (event) => {
+    if (settingsDragStartY === null) return;
+    const dragDistance = Math.max(0, event.clientY - settingsDragStartY);
+    clearSettingsDrag();
+    if (dragDistance >= 88) settingsDialog.close();
+  });
+  settingsHandle.addEventListener('pointercancel', clearSettingsDrag);
+  settingsDialog.addEventListener('close', clearSettingsDrag);
 
   function loadSavedState() {
     try {
@@ -472,7 +514,8 @@
 
   document.querySelector('#open-settings').addEventListener('click', () => {
     playHaptic();
-    settingsDialog.showModal();
+    if (settingsDialog.open) settingsDialog.close();
+    else settingsDialog.showModal();
   });
   document.querySelector('#close-settings').addEventListener('click', () => {
     playHaptic();
