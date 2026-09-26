@@ -61,7 +61,88 @@
       </div>
 
       <p class="storage-notice" id="storage-notice" role="status" aria-live="polite" hidden></p>
-      <div id="app-content"></div>
+      <div id="app-content">
+        <section class="scoring-section" id="whole-rings-content" aria-labelledby="whole-rings-title">
+          <div class="tenths-heading">
+            <div class="section-heading">
+              <h1 id="whole-rings-title">Treffer nach Ringwert</h1>
+              <p>Mit + und − die Trefferzahl anpassen.</p>
+            </div>
+            <button class="undo-button" type="button" data-action="undo-ring" aria-label="Letzte Änderung rückgängig machen" title="Letzte Änderung rückgängig machen" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h9a7 7 0 0 1 7 7v3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+            </button>
+          </div>
+          <div class="ring-card">
+            <table class="ring-table">
+              <caption class="visually-hidden">Trefferzahl und Punkte je Ringwert</caption>
+              <thead><tr><th scope="col">Ring</th><th scope="col">Treffer</th><th scope="col">Punkte</th><th scope="col"><span class="visually-hidden">Treffer anpassen</span></th></tr></thead>
+              <tbody>
+                <tr data-ring-row="10"><td><span class="ring-badge is-ten">10</span></td><td class="ring-count" data-ring-count>0×</td><td class="ring-points" data-ring-points>0</td><td><div class="ring-controls"><button class="ring-button" type="button" data-action="ring-minus" data-ring="10" aria-label="Ring 10 verringern" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button><button class="ring-button" type="button" data-action="ring-plus" data-ring="10" aria-label="Ring 10 hinzufügen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button></div></td></tr>
+                <tr data-ring-row="9"><td><span class="ring-badge">9</span></td><td class="ring-count" data-ring-count>0×</td><td class="ring-points" data-ring-points>0</td><td><div class="ring-controls"><button class="ring-button" type="button" data-action="ring-minus" data-ring="9" aria-label="Ring 9 verringern" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button><button class="ring-button" type="button" data-action="ring-plus" data-ring="9" aria-label="Ring 9 hinzufügen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button></div></td></tr>
+                <tr data-ring-row="8"><td><span class="ring-badge">8</span></td><td class="ring-count" data-ring-count>0×</td><td class="ring-points" data-ring-points>0</td><td><div class="ring-controls"><button class="ring-button" type="button" data-action="ring-minus" data-ring="8" aria-label="Ring 8 verringern" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button><button class="ring-button" type="button" data-action="ring-plus" data-ring="8" aria-label="Ring 8 hinzufügen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button></div></td></tr>
+                <tr data-ring-row="7"><td><span class="ring-badge">7</span></td><td class="ring-count" data-ring-count>0×</td><td class="ring-points" data-ring-points>0</td><td><div class="ring-controls"><button class="ring-button" type="button" data-action="ring-minus" data-ring="7" aria-label="Ring 7 verringern" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button><button class="ring-button" type="button" data-action="ring-plus" data-ring="7" aria-label="Ring 7 hinzufügen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button></div></td></tr>
+                <tr data-ring-row="6"><td><span class="ring-badge">6</span></td><td class="ring-count" data-ring-count>0×</td><td class="ring-points" data-ring-points>0</td><td><div class="ring-controls"><button class="ring-button" type="button" data-action="ring-minus" data-ring="6" aria-label="Ring 6 verringern" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button><button class="ring-button" type="button" data-action="ring-plus" data-ring="6" aria-label="Ring 6 hinzufügen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button></div></td></tr>
+                <tr data-ring-row="5"><td><span class="ring-badge">5</span></td><td class="ring-count" data-ring-count>0×</td><td class="ring-points" data-ring-points>0</td><td><div class="ring-controls"><button class="ring-button" type="button" data-action="ring-minus" data-ring="5" aria-label="Ring 5 verringern" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button><button class="ring-button" type="button" data-action="ring-plus" data-ring="5" aria-label="Ring 5 hinzufügen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button></div></td></tr>
+                <tr data-ring-row="4"><td><span class="ring-badge">4</span></td><td class="ring-count" data-ring-count>0×</td><td class="ring-points" data-ring-points>0</td><td><div class="ring-controls"><button class="ring-button" type="button" data-action="ring-minus" data-ring="4" aria-label="Ring 4 verringern" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button><button class="ring-button" type="button" data-action="ring-plus" data-ring="4" aria-label="Ring 4 hinzufügen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button></div></td></tr>
+                <tr data-ring-row="3"><td><span class="ring-badge">3</span></td><td class="ring-count" data-ring-count>0×</td><td class="ring-points" data-ring-points>0</td><td><div class="ring-controls"><button class="ring-button" type="button" data-action="ring-minus" data-ring="3" aria-label="Ring 3 verringern" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button><button class="ring-button" type="button" data-action="ring-plus" data-ring="3" aria-label="Ring 3 hinzufügen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button></div></td></tr>
+                <tr data-ring-row="2"><td><span class="ring-badge">2</span></td><td class="ring-count" data-ring-count>0×</td><td class="ring-points" data-ring-points>0</td><td><div class="ring-controls"><button class="ring-button" type="button" data-action="ring-minus" data-ring="2" aria-label="Ring 2 verringern" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button><button class="ring-button" type="button" data-action="ring-plus" data-ring="2" aria-label="Ring 2 hinzufügen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button></div></td></tr>
+                <tr data-ring-row="1"><td><span class="ring-badge">1</span></td><td class="ring-count" data-ring-count>0×</td><td class="ring-points" data-ring-points>0</td><td><div class="ring-controls"><button class="ring-button" type="button" data-action="ring-minus" data-ring="1" aria-label="Ring 1 verringern" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button><button class="ring-button" type="button" data-action="ring-plus" data-ring="1" aria-label="Ring 1 hinzufügen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button></div></td></tr>
+                <tr data-ring-row="0"><td><span class="ring-badge">0</span></td><td class="ring-count" data-ring-count>0×</td><td class="ring-points" data-ring-points>0</td><td><div class="ring-controls"><button class="ring-button" type="button" data-action="ring-minus" data-ring="0" aria-label="Ring 0 verringern" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button><button class="ring-button" type="button" data-action="ring-plus" data-ring="0" aria-label="Ring 0 hinzufügen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg></button></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <button class="reset-button" type="button" data-action="reset" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-.8 13H6.8L6 7m4 4v5m4-5v5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" /></svg>
+            <span>Zurücksetzen</span>
+          </button>
+        </section>
+
+        <section class="scoring-section" id="tenths-content" aria-labelledby="tenths-title" hidden>
+          <div class="tenths-heading">
+            <div class="section-heading">
+              <h1 id="tenths-title">Einzelschüsse</h1>
+              <p>In der Reihenfolge deiner Eingabe.</p>
+            </div>
+            <button class="undo-button" type="button" data-action="undo-shot" aria-label="Letzten Schuss löschen" title="Letzten Schuss löschen" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h9a7 7 0 0 1 7 7v3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>
+            </button>
+          </div>
+          <div class="tenths-workspace">
+            <div class="shots-column">
+              <div class="empty-shots" data-empty-shots>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8" /><circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8" /><circle cx="12" cy="12" r="1" fill="currentColor" /></svg>
+                <p>Deine Schüsse erscheinen hier.</p>
+              </div>
+              <div class="shots-card" data-shots-card hidden>
+                <div class="shot-list" data-shot-list role="list" aria-label="Eingegebene Schüsse"></div>
+              </div>
+            </div>
+            <form class="shot-entry-card" id="shot-form" novalidate>
+              <h2>Neuer Schuss</h2>
+              <label class="input-label" for="shot-input">Ringwert</label>
+              <div class="shot-input-wrap">
+                <input class="shot-input" id="shot-input" data-shot-input type="text" inputmode="decimal" autocomplete="off" maxlength="4" value="10,0" aria-invalid="false" aria-describedby="shot-error">
+                <span class="shot-input-suffix">Punkte</span>
+              </div>
+              <p class="shot-error" id="shot-error" hidden>Wert zwischen 0,0 und 10,9 eingeben</p>
+              <div class="step-controls" aria-label="Ringwert anpassen">
+                <button class="step-button" type="button" data-action="step" data-amount="-10" disabled>−1,0</button>
+                <button class="step-button" type="button" data-action="step" data-amount="-1" disabled>−0,1</button>
+                <button class="step-button" type="button" data-action="step" data-amount="1">+0,1</button>
+                <button class="step-button" type="button" data-action="step" data-amount="10">+1,0</button>
+              </div>
+              <button class="primary-button add-shot-button" type="submit">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg>
+                <span>Schuss hinzufügen</span>
+              </button>
+            </form>
+          </div>
+          <button class="reset-button" type="button" data-action="reset" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-.8 13H6.8L6 7m4 4v5m4-5v5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" /></svg>
+            <span>Zurücksetzen</span>
+          </button>
+        </section>
+      </div>
     </main>
 
     <dialog class="app-dialog" id="reset-dialog" aria-labelledby="reset-title">

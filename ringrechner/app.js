@@ -5,6 +5,19 @@
   const HAPTICS_KEY = 'ringrechner.pwa.v1.hapticsEnabled';
   const appShell = document.querySelector('#app-shell');
   const appContent = document.querySelector('#app-content');
+  const wholeRingsContent = document.querySelector('#whole-rings-content');
+  const tenthsContent = document.querySelector('#tenths-content');
+  const shotList = document.querySelector('[data-shot-list]');
+  const shotsCard = document.querySelector('[data-shots-card]');
+  const emptyShots = document.querySelector('[data-empty-shots]');
+  const shotInput = document.querySelector('[data-shot-input]');
+  const shotError = document.querySelector('#shot-error');
+  const shotSubmitButton = document.querySelector('#shot-form [type="submit"]');
+  const stepButtons = Array.from(document.querySelectorAll('[data-action="step"]'));
+  const modeButtons = Array.from(document.querySelectorAll('[data-mode]'));
+  const summaryShots = document.querySelector('#summary-shots');
+  const summaryTotal = document.querySelector('#summary-total');
+  const summaryAverage = document.querySelector('#summary-average');
   const storageNotice = document.querySelector('#storage-notice');
   const resetDialog = document.querySelector('#reset-dialog');
   const settingsDialog = document.querySelector('#settings-dialog');
@@ -21,6 +34,7 @@
     rings: Array(11).fill(0),
     ringHistory: [],
     decimalShots: [],
+    decimalTotalTenths: 0,
   };
   let draft = '10,0';
   let hapticsEnabled = true;
@@ -99,6 +113,7 @@
           state.decimalShots = saved.decimalShots.filter(
             (shot) => Number.isInteger(shot) && shot >= 0 && shot <= 109,
           );
+          state.decimalTotalTenths = state.decimalShots.reduce((sum, shot) => sum + shot, 0);
         }
       }
     } catch {
@@ -126,6 +141,7 @@
     } catch {
       storageMessage = 'Die Wertung kann gerade nicht lokal gespeichert werden.';
     }
+    updateStorageNotice();
   }
 
   function saveHaptics() {
@@ -177,118 +193,68 @@
       };
     }
 
-    const totalTenths = state.decimalShots.reduce((sum, shot) => sum + shot, 0);
     const shots = state.decimalShots.length;
     return {
       shots,
-      total: formatTenths(totalTenths),
-      average: formatAverage(totalTenths, shots),
+      total: formatTenths(state.decimalTotalTenths),
+      average: formatAverage(state.decimalTotalTenths, shots),
       hasScore: shots > 0,
     };
   }
 
-  function escapeHtml(value) {
-    return String(value)
-      .replaceAll('&', '&amp;')
-      .replaceAll('"', '&quot;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;');
+  function updateRingRow(ring) {
+    const row = wholeRingsContent.querySelector(`[data-ring-row="${ring}"]`);
+    if (!row) return;
+    const count = state.rings[ring];
+    row.querySelector('[data-ring-count]').textContent = `${count}×`;
+    row.querySelector('[data-ring-points]').textContent = String(ring * count);
+    row.querySelector('[data-action="ring-minus"]').disabled = count === 0;
   }
 
-  function buttonIcon(name) {
-    if (name === 'plus') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg>';
-    if (name === 'minus') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg>';
-    if (name === 'reset') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m3 0-.8 13H6.8L6 7m4 4v5m4-5v5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" /></svg>';
-    if (name === 'undo') return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h9a7 7 0 0 1 7 7v3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" /></svg>';
-    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" /></svg>';
+  function updateAllRingRows() {
+    for (let ring = 0; ring <= 10; ring += 1) updateRingRow(ring);
   }
 
-  function renderWholeRings() {
-    const rows = [];
-    for (let ring = 10; ring >= 0; ring -= 1) {
-      const count = state.rings[ring];
-      rows.push(`
-        <tr>
-          <td><span class="ring-badge${ring === 10 ? ' is-ten' : ''}">${ring}</span></td>
-          <td class="ring-count">${count}×</td>
-          <td class="ring-points">${ring * count}</td>
-          <td>
-            <div class="ring-controls">
-              <button class="ring-button" type="button" data-action="ring-minus" data-ring="${ring}" aria-label="Ring ${ring} verringern" ${count === 0 ? 'disabled' : ''}>${buttonIcon('minus')}</button>
-              <button class="ring-button" type="button" data-action="ring-plus" data-ring="${ring}" aria-label="Ring ${ring} hinzufügen">${buttonIcon('plus')}</button>
-            </div>
-          </td>
-        </tr>`);
-    }
-
-    const hasScore = getMetrics().hasScore;
-    return `
-      <section class="scoring-section" aria-labelledby="whole-rings-title">
-        <div class="tenths-heading">
-          <div class="section-heading">
-            <h1 id="whole-rings-title">Treffer nach Ringwert</h1>
-            <p>Mit + und − die Trefferzahl anpassen.</p>
-          </div>
-          <button class="undo-button" type="button" data-action="undo-ring" aria-label="Letzte Änderung rückgängig machen" title="Letzte Änderung rückgängig machen" ${state.ringHistory.length > 0 ? '' : 'disabled'}>${buttonIcon('undo')}</button>
-        </div>
-        <div class="ring-card">
-          <table class="ring-table">
-            <caption class="visually-hidden">Trefferzahl und Punkte je Ringwert</caption>
-            <thead><tr><th scope="col">Ring</th><th scope="col">Treffer</th><th scope="col">Punkte</th><th scope="col"><span class="visually-hidden">Treffer anpassen</span></th></tr></thead>
-            <tbody>${rows.join('')}</tbody>
-          </table>
-        </div>
-        <button class="reset-button" type="button" data-action="reset" ${hasScore ? '' : 'disabled'}>${buttonIcon('reset')}<span>Zurücksetzen</span></button>
-      </section>`;
-  }
-
-  function renderShotList() {
-    if (state.decimalShots.length === 0) {
-      return `
-        <div class="empty-shots">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8" /><circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8" /><circle cx="12" cy="12" r="1" fill="currentColor" /></svg>
-          <p>Deine Schüsse erscheinen hier.</p>
-        </div>`;
-    }
-
-    const shots = state.decimalShots.map((shot, index) => `
-      <span class="shot-chip" role="listitem" aria-label="Schuss ${index + 1}: ${formatTenths(shot)}">${formatTenths(shot)}</span>`).join('');
-    return `<div class="shots-card"><div class="shot-list" role="list" aria-label="Eingegebene Schüsse">${shots}</div></div>`;
-  }
-
-  function renderTenths() {
-    const validShot = parseShot(draft) !== null;
+  function updateShotListVisibility() {
     const hasShots = state.decimalShots.length > 0;
-    return `
-      <section class="scoring-section" aria-labelledby="tenths-title">
-        <div class="tenths-heading">
-          <div class="section-heading">
-            <h1 id="tenths-title">Einzelschüsse</h1>
-            <p>In der Reihenfolge deiner Eingabe.</p>
-          </div>
-          <button class="undo-button" type="button" data-action="undo-shot" aria-label="Letzten Schuss löschen" title="Letzten Schuss löschen" ${hasShots ? '' : 'disabled'}>${buttonIcon('undo')}</button>
-        </div>
-        <div class="tenths-workspace">
-          <div class="shots-column">${renderShotList()}</div>
-          <form class="shot-entry-card" id="shot-form" novalidate>
-            <h2>Neuer Schuss</h2>
-            <label class="input-label" for="shot-input">Ringwert</label>
-            <div class="shot-input-wrap">
-              <input class="shot-input" id="shot-input" data-shot-input type="text" inputmode="decimal" autocomplete="off" maxlength="4" value="${escapeHtml(draft)}" aria-invalid="${!validShot}" aria-describedby="shot-error">
-              <span class="shot-input-suffix">Punkte</span>
-            </div>
-            <p class="shot-error" id="shot-error"${validShot ? ' hidden' : ''}>Wert zwischen 0,0 und 10,9 eingeben</p>
-            <div class="step-controls" aria-label="Ringwert anpassen">
-              <button class="step-button" type="button" data-action="step" data-amount="-10" ${canStep(-10) ? '' : 'disabled'}>−1,0</button>
-              <button class="step-button" type="button" data-action="step" data-amount="-1" ${canStep(-1) ? '' : 'disabled'}>−0,1</button>
-              <button class="step-button" type="button" data-action="step" data-amount="1" ${canStep(1) ? '' : 'disabled'}>+0,1</button>
-              <button class="step-button" type="button" data-action="step" data-amount="10" ${canStep(10) ? '' : 'disabled'}>+1,0</button>
-            </div>
-            <button class="primary-button add-shot-button" type="submit" ${validShot ? '' : 'disabled'}>${buttonIcon('plus')}<span>Schuss hinzufügen</span></button>
-          </form>
-        </div>
-        <button class="reset-button" type="button" data-action="reset" ${getMetrics().hasScore ? '' : 'disabled'}>${buttonIcon('reset')}<span>Zurücksetzen</span></button>
-      </section>`;
+    emptyShots.hidden = hasShots;
+    shotsCard.hidden = !hasShots;
+  }
+
+  function createShotChip(shot, index) {
+    const chip = document.createElement('span');
+    chip.className = 'shot-chip';
+    chip.setAttribute('role', 'listitem');
+    chip.setAttribute('aria-label', `Schuss ${index + 1}: ${formatTenths(shot)}`);
+    chip.textContent = formatTenths(shot);
+    return chip;
+  }
+
+  function populateShotList() {
+    const fragment = document.createDocumentFragment();
+    state.decimalShots.forEach((shot, index) => fragment.append(createShotChip(shot, index)));
+    shotList.replaceChildren(fragment);
+    updateShotListVisibility();
+  }
+
+  function updateWholeRingControls() {
+    const hasRingScore = state.rings.some((count) => count > 0);
+    wholeRingsContent.querySelector('[data-action="undo-ring"]').disabled = state.ringHistory.length === 0;
+    wholeRingsContent.querySelector('[data-action="reset"]').disabled = !hasRingScore;
+  }
+
+  function updateTenthsControls() {
+    const hasTenthsShots = state.decimalShots.length > 0;
+    tenthsContent.querySelector('[data-action="undo-shot"]').disabled = !hasTenthsShots;
+    tenthsContent.querySelector('[data-action="reset"]').disabled = !hasTenthsShots;
+    updateShotListVisibility();
+  }
+
+  function updateSummary() {
+    const metrics = getMetrics();
+    summaryShots.textContent = String(metrics.shots);
+    summaryTotal.textContent = metrics.total;
+    summaryAverage.textContent = metrics.average;
   }
 
   function canStep(amount) {
@@ -297,14 +263,11 @@
   }
 
   function updateShotEditor() {
-    const input = appContent.querySelector('[data-shot-input]');
-    if (!input) return;
-    const valid = parseShot(input.value) !== null;
-    input.setAttribute('aria-invalid', String(!valid));
-    const error = appContent.querySelector('#shot-error');
-    error.hidden = valid;
-    appContent.querySelector('[type="submit"]').disabled = !valid;
-    appContent.querySelectorAll('[data-action="step"]').forEach((button) => {
+    const valid = parseShot(shotInput.value) !== null;
+    shotInput.setAttribute('aria-invalid', String(!valid));
+    shotError.hidden = valid;
+    shotSubmitButton.disabled = !valid;
+    stepButtons.forEach((button) => {
       button.disabled = !canStep(Number(button.dataset.amount));
     });
   }
@@ -367,17 +330,13 @@
   }
 
   function render() {
-    const metrics = getMetrics();
-    document.querySelector('#summary-shots').textContent = String(metrics.shots);
-    document.querySelector('#summary-total').textContent = metrics.total;
-    document.querySelector('#summary-average').textContent = metrics.average;
-
-    document.querySelectorAll('[data-mode]').forEach((button) => {
+    updateSummary();
+    modeButtons.forEach((button) => {
       const selected = button.dataset.mode === state.mode;
       button.setAttribute('aria-pressed', String(selected));
     });
-
-    appContent.innerHTML = state.mode === 'wholeRings' ? renderWholeRings() : renderTenths();
+    wholeRingsContent.hidden = state.mode !== 'wholeRings';
+    tenthsContent.hidden = state.mode !== 'tenths';
     updateStorageNotice();
     updateHapticsSetting();
     updateInstallSetting();
@@ -414,9 +373,14 @@
       state.rings[ring] += delta;
       state.ringHistory.push({ ring, delta });
       playHaptic();
+      updateRingRow(ring);
+      updateSummary();
+      updateWholeRingControls();
       saveScore();
-      render();
-      appContent.querySelector(`[data-action="${action}"][data-ring="${ring}"]`)?.focus({ preventScroll: true });
+      const focusTarget = delta < 0 && state.rings[ring] === 0
+        ? wholeRingsContent.querySelector(`[data-action="ring-plus"][data-ring="${ring}"]`)
+        : button;
+      focusTarget.focus({ preventScroll: true });
       return;
     }
 
@@ -426,8 +390,7 @@
       if (current === null || current + amount < 0 || current + amount > 109) return;
       playHaptic();
       draft = formatTenths(current + amount);
-      const input = appContent.querySelector('[data-shot-input]');
-      input.value = draft;
+      shotInput.value = draft;
       updateShotEditor();
       return;
     }
@@ -437,19 +400,31 @@
       if (!change) return;
       state.rings[change.ring] -= change.delta;
       playHaptic();
+      updateRingRow(change.ring);
+      updateSummary();
+      updateWholeRingControls();
       saveScore();
-      render();
-      appContent.querySelector('[data-action="undo-ring"]')?.focus({ preventScroll: true });
+      const focusTarget = state.ringHistory.length > 0
+        ? wholeRingsContent.querySelector('[data-action="undo-ring"]')
+        : wholeRingsContent.querySelector(`[data-action="ring-plus"][data-ring="${change.ring}"]`);
+      focusTarget.focus({ preventScroll: true });
       return;
     }
 
     if (action === 'undo-shot') {
       if (state.decimalShots.length === 0) return;
       playHaptic();
-      state.decimalShots.pop();
+      state.decimalTotalTenths -= state.decimalShots.pop();
+      shotList.lastElementChild?.remove();
+      updateSummary();
+      updateTenthsControls();
       saveScore();
-      render();
-      appContent.querySelector('[data-action="undo-shot"]')?.focus({ preventScroll: true });
+      const focusTarget = state.decimalShots.length > 0
+        ? button
+        : shotSubmitButton.disabled
+          ? modeButtons.find((modeButton) => modeButton.dataset.mode === 'tenths')
+          : shotSubmitButton;
+      focusTarget?.focus({ preventScroll: true });
       return;
     }
 
@@ -483,8 +458,11 @@
     if (shot === null) return;
     playHaptic();
     state.decimalShots.push(shot);
+    state.decimalTotalTenths += shot;
+    shotList.append(createShotChip(shot, state.decimalShots.length - 1));
+    updateSummary();
+    updateTenthsControls();
     saveScore();
-    render();
   });
 
   document.addEventListener('click', (event) => {
@@ -499,12 +477,19 @@
     if (state.mode === 'wholeRings') {
       state.rings.fill(0);
       state.ringHistory = [];
+      updateAllRingRows();
+      updateWholeRingControls();
     } else {
       state.decimalShots = [];
+      state.decimalTotalTenths = 0;
+      shotList.replaceChildren();
       draft = '10,0';
+      shotInput.value = draft;
+      updateShotEditor();
+      updateTenthsControls();
     }
+    updateSummary();
     saveScore();
-    render();
     resetDialog.close();
   });
   document.querySelector('#cancel-reset').addEventListener('click', () => {
@@ -570,6 +555,10 @@
   window.matchMedia('(display-mode: standalone)').addEventListener?.('change', updateInstallSetting);
 
   loadSavedState();
+  updateAllRingRows();
+  populateShotList();
+  updateWholeRingControls();
+  updateTenthsControls();
   render();
 
   if ('serviceWorker' in navigator) {
