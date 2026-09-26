@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ringrechner-pwa-v4';
+const CACHE_NAME = 'ringrechner-pwa-v7';
 const APP_FILES = [
   './',
   './index.html',
