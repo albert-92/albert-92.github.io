@@ -88,6 +88,14 @@
           <input class="switch-input" id="haptics-toggle" type="checkbox" aria-describedby="haptics-description">
           <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
         </label>
+        <div class="install-setting-row">
+          <span class="setting-copy">
+            <span class="setting-title">App installieren</span>
+            <span class="setting-subtitle" id="install-subtitle">Zum Startbildschirm hinzufügen</span>
+          </span>
+          <button class="secondary-button install-button" id="install-app" type="button" aria-describedby="install-subtitle">Installieren</button>
+        </div>
+        <p class="install-notice" id="install-notice" role="status" aria-live="polite" hidden></p>
         <div class="settings-actions">
           <button class="secondary-button" id="close-settings" type="button">Schließen</button>
         </div>

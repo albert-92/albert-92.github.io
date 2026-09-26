@@ -10,6 +10,9 @@
   const settingsDialog = document.querySelector('#settings-dialog');
   const hapticsToggle = document.querySelector('#haptics-toggle');
   const hapticsDescription = document.querySelector('#haptics-description');
+  const installButton = document.querySelector('#install-app');
+  const installSubtitle = document.querySelector('#install-subtitle');
+  const installNotice = document.querySelector('#install-notice');
   const supportsHaptics = typeof navigator.vibrate === 'function';
 
   const state = {
@@ -21,6 +24,9 @@
   let draft = '10,0';
   let hapticsEnabled = true;
   let storageMessage = '';
+  let deferredInstallPrompt = null;
+  let installGuideShown = false;
+  let appInstalled = false;
 
   function loadSavedState() {
     try {
@@ -268,6 +274,31 @@
       : 'Auf diesem Gerät nicht verfügbar';
   }
 
+  function isAppInstalled() {
+    return appInstalled || window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  }
+
+  function getInstallInstructions() {
+    const isAppleMobile = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    return isAppleMobile
+      ? 'Öffne das Teilen-Menü und wähle „Zum Home-Bildschirm“. '
+        + 'Danach kannst du Ringrechner wie eine App starten.'
+      : 'Öffne das Browsermenü und wähle „Installieren“ oder „Zum Startbildschirm hinzufügen“.';
+  }
+
+  function updateInstallSetting() {
+    const installed = isAppInstalled();
+    installButton.disabled = installed;
+    installButton.textContent = installed ? 'Installiert' : 'Installieren';
+    installSubtitle.textContent = installed
+      ? 'Die App ist bereits installiert.'
+      : deferredInstallPrompt
+        ? 'Direkt über den Browser installieren'
+        : 'Zum Startbildschirm hinzufügen';
+    installNotice.hidden = !installGuideShown;
+  }
+
   function render() {
     const metrics = getMetrics();
     document.querySelector('#summary-shots').textContent = String(metrics.shots);
@@ -282,6 +313,7 @@
     appContent.innerHTML = state.mode === 'wholeRings' ? renderWholeRings() : renderTenths();
     updateStorageNotice();
     updateHapticsSetting();
+    updateInstallSetting();
     updateShotEditor();
   }
 
@@ -422,6 +454,49 @@
     settingsDialog.close();
   });
   hapticsToggle.addEventListener('change', () => changeHaptics(hapticsToggle.checked));
+  installButton.addEventListener('click', () => {
+    playHaptic();
+    if (!deferredInstallPrompt) {
+      installGuideShown = true;
+      installNotice.textContent = getInstallInstructions();
+      updateInstallSetting();
+      return;
+    }
+
+    const installPrompt = deferredInstallPrompt;
+    deferredInstallPrompt = null;
+    installGuideShown = false;
+    installPrompt.prompt();
+    updateInstallSetting();
+    installPrompt.userChoice.then(({ outcome }) => {
+      if (outcome === 'accepted') {
+        installGuideShown = true;
+        installNotice.textContent = 'Die Installation wurde gestartet.';
+      } else {
+        installGuideShown = true;
+        installNotice.textContent = getInstallInstructions();
+      }
+      updateInstallSetting();
+    }).catch(() => {
+      installGuideShown = true;
+      installNotice.textContent = getInstallInstructions();
+      updateInstallSetting();
+    });
+  });
+
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    installGuideShown = false;
+    updateInstallSetting();
+  });
+  window.addEventListener('appinstalled', () => {
+    appInstalled = true;
+    deferredInstallPrompt = null;
+    installGuideShown = false;
+    updateInstallSetting();
+  });
+  window.matchMedia('(display-mode: standalone)').addEventListener?.('change', updateInstallSetting);
 
   loadSavedState();
   render();

@@ -384,6 +384,11 @@ button:focus-visible, a:focus-visible, input:focus-visible + .switch-track {
 .setting-copy { display: grid; gap: 4px; }
 .setting-title { font-weight: 650; }
 .setting-subtitle { color: var(--ink-soft); font-size: .86rem; }
+.install-setting-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 18px 0; border-top: 1px solid var(--outline); }
+.install-button { min-height: 42px; padding: 8px 14px; }
+.install-button:disabled { opacity: .6; cursor: default; }
+.install-notice { margin: -8px 0 18px; color: var(--ink-soft); font-size: .9rem; line-height: 1.45; }
+.install-notice[hidden] { display: none; }
 .switch-input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .switch-track { display: flex; width: 42px; height: 26px; align-items: center; padding: 3px; border: 1px solid var(--outline-strong); border-radius: 99px; background: var(--surface-high); transition: background .15s ease; }
 .switch-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--outline-strong); transition: transform .15s ease, background .15s ease; }

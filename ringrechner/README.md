@@ -7,7 +7,7 @@ Ein einfacher, für Mobilgeräte optimierter Ringrechner für das Bogenschießen
 - **Ganze Ringe:** Treffer für die Ringe 0 bis 10 mit den Plus- und Minustasten erfassen. Die App zeigt Trefferzahl, Gesamtpunktzahl und Durchschnitt pro Schuss.
 - **Zehntel:** Einzelne Schusswerte von 0,0 bis 10,9 eingeben oder mit den Schritt-Tasten anpassen. Die Schüsse erscheinen in Eingabereihenfolge; der letzte Schuss kann rückgängig gemacht werden.
 - Die Modi haben getrennte Wertungen. Über **Zurücksetzen** wird die Wertung des gerade geöffneten Modus gelöscht.
-- Unter **Einstellungen** lässt sich haptisches Feedback aktivieren oder deaktivieren, sofern das Gerät es unterstützt.
+- Unter **Einstellungen** lässt sich haptisches Feedback aktivieren oder deaktivieren, sofern das Gerät es unterstützt, und die App installieren.
 
 Wertungen und die Einstellung für haptisches Feedback werden im lokalen Speicher des Browsers auf diesem Gerät gespeichert.
 
