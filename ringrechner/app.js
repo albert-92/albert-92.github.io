@@ -27,6 +27,7 @@
   let deferredInstallPrompt = null;
   let installGuideShown = false;
   let appInstalled = false;
+  let installPromptPending = false;
 
   function loadSavedState() {
     try {
@@ -278,24 +279,48 @@
     return appInstalled || window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
   }
 
-  function getInstallInstructions() {
+  function getInstallPlatform() {
     const isAppleMobile = /iPhone|iPad|iPod/i.test(navigator.userAgent)
       || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    return isAppleMobile
-      ? 'Öffne das Teilen-Menü und wähle „Zum Home-Bildschirm“. '
-        + 'Danach kannst du Ringrechner wie eine App starten.'
-      : 'Öffne das Browsermenü und wähle „Installieren“ oder „Zum Startbildschirm hinzufügen“.';
+    if (isAppleMobile) return 'ios';
+    if (/Android/i.test(navigator.userAgent)) return 'android';
+    return 'other';
+  }
+
+  function getInstallInstructions() {
+    const platform = getInstallPlatform();
+    if (platform === 'ios') {
+      return 'iPhone oder iPad: Öffne diese Seite in Safari. Tippe auf „Teilen“ → '
+        + '„Zum Home-Bildschirm hinzufügen“. Aktiviere „Als Web-App öffnen“, '
+        + 'wenn die Option angezeigt wird, und tippe auf „Hinzufügen“.';
+    }
+    if (platform === 'android') {
+      return 'Android: Öffne das Menü ⋮ in Chrome und wähle „App installieren“ '
+        + 'oder „Zum Startbildschirm hinzufügen“. Wenn du diese Seite in einer '
+        + 'anderen App geöffnet hast, öffne sie zuerst in Chrome.';
+    }
+    return 'Öffne das Browsermenü und wähle „Installieren“ oder '
+      + '„Zum Startbildschirm hinzufügen“.';
   }
 
   function updateInstallSetting() {
     const installed = isAppInstalled();
-    installButton.disabled = installed;
-    installButton.textContent = installed ? 'Installiert' : 'Installieren';
+    const platform = getInstallPlatform();
+    installButton.disabled = installed || installPromptPending;
+    installButton.textContent = installed
+      ? 'Bereits installiert'
+      : installPromptPending
+        ? 'Installationsdialog geöffnet …'
+        : deferredInstallPrompt ? 'Jetzt installieren' : 'Installationsanleitung';
     installSubtitle.textContent = installed
       ? 'Die App ist bereits installiert.'
       : deferredInstallPrompt
-        ? 'Direkt über den Browser installieren'
-        : 'Zum Startbildschirm hinzufügen';
+        ? 'Der Browser öffnet den Installationsdialog.'
+        : platform === 'ios'
+          ? 'Über Safari zum Home-Bildschirm hinzufügen.'
+          : platform === 'android'
+            ? 'Installation über das Menü von Chrome oder deinem Browser.'
+            : 'Installation über das Menü deines Browsers.';
     installNotice.hidden = !installGuideShown;
   }
 
@@ -454,7 +479,7 @@
     settingsDialog.close();
   });
   hapticsToggle.addEventListener('change', () => changeHaptics(hapticsToggle.checked));
-  installButton.addEventListener('click', () => {
+  installButton.addEventListener('click', async () => {
     playHaptic();
     if (!deferredInstallPrompt) {
       installGuideShown = true;
@@ -466,9 +491,11 @@
     const installPrompt = deferredInstallPrompt;
     deferredInstallPrompt = null;
     installGuideShown = false;
-    installPrompt.prompt();
+    installPromptPending = true;
     updateInstallSetting();
-    installPrompt.userChoice.then(({ outcome }) => {
+    try {
+      await installPrompt.prompt();
+      const { outcome } = await installPrompt.userChoice;
       if (outcome === 'accepted') {
         installGuideShown = true;
         installNotice.textContent = 'Die Installation wurde gestartet.';
@@ -476,12 +503,12 @@
         installGuideShown = true;
         installNotice.textContent = getInstallInstructions();
       }
-      updateInstallSetting();
-    }).catch(() => {
+    } catch {
       installGuideShown = true;
       installNotice.textContent = getInstallInstructions();
-      updateInstallSetting();
-    });
+    }
+    installPromptPending = false;
+    updateInstallSetting();
   });
 
   window.addEventListener('beforeinstallprompt', (event) => {
@@ -494,6 +521,7 @@
     appInstalled = true;
     deferredInstallPrompt = null;
     installGuideShown = false;
+    installPromptPending = false;
     updateInstallSetting();
   });
   window.matchMedia('(display-mode: standalone)').addEventListener?.('change', updateInstallSetting);
