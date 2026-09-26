@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="Ein einfacher Ringrechner für das Bogenschießen.">
+    <meta name="theme-color" content="#f4f8f6">
+    <meta name="theme-color" content="#101514" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Ringrechner">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <link rel="icon" type="image/png" href="./favicon.png">
+    <link rel="apple-touch-icon" href="./icons/Icon-192.png">
+    <link rel="stylesheet" href="./styles.css">
+    <title>Ringrechner</title>
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="header-inner">
+        <a class="brand" href="./" aria-label="Ringrechner Startseite">
+          <svg class="brand-icon" viewBox="0 0 32 32" aria-hidden="true">
+            <circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2.8" />
+            <circle cx="16" cy="16" r="6.5" fill="none" stroke="currentColor" stroke-width="2.8" />
+            <path d="M26 6 16 16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2.8" />
+            <circle cx="16" cy="16" r="2" fill="currentColor" />
+          </svg>
+          <span>Ringrechner</span>
+        </a>
+        <button class="icon-button" id="open-settings" type="button" aria-label="Einstellungen" title="Einstellungen">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Zm9 4.9v-2l-2.2-.7a7.3 7.3 0 0 0-.7-1.7l1.1-2-1.4-1.4-2 1.1a7.3 7.3 0 0 0-1.7-.7L13.4 3h-2l-.7 2.2a7.3 7.3 0 0 0-1.7.7L7 4.8 5.6 6.2l1.1 2a7.3 7.3 0 0 0-.7 1.7l-2.2.7v2l2.2.7c.1.6.4 1.2.7 1.7l-1.1 2L7 18.4l2-1.1c.5.3 1.1.6 1.7.7l.7 2.2h2l.7-2.2c.6-.1 1.2-.4 1.7-.7l2 1.1 1.4-1.4-1.1-2c.3-.5.6-1.1.7-1.7l2.2-.7Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="app-shell" id="app-shell">
+      <div class="mode-switch" role="group" aria-label="Wertungsmodus">
+        <button class="mode-button" type="button" data-mode="wholeRings" aria-pressed="true">Ganze Ringe</button>
+        <button class="mode-button" type="button" data-mode="tenths" aria-pressed="false">Zehntel</button>
+      </div>
+
+      <div class="summary-sticky">
+        <section class="score-summary" aria-label="Aktuelle Wertung">
+          <div class="summary-value">
+            <span class="summary-label">Schüsse</span>
+            <strong id="summary-shots">0</strong>
+          </div>
+          <span class="summary-divider" aria-hidden="true"></span>
+          <div class="summary-value summary-total">
+            <span class="summary-label">Ergebnis</span>
+            <strong id="summary-total">0</strong>
+          </div>
+          <span class="summary-divider" aria-hidden="true"></span>
+          <div class="summary-value summary-average">
+            <span class="summary-label">Ø pro Schuss</span>
+            <strong id="summary-average">–</strong>
+          </div>
+        </section>
+      </div>
+
+      <p class="storage-notice" id="storage-notice" role="status" aria-live="polite" hidden></p>
+      <div id="app-content"></div>
+    </main>
+
+    <dialog class="app-dialog" id="reset-dialog" aria-labelledby="reset-title">
+      <div class="dialog-handle" aria-hidden="true"></div>
+      <div class="dialog-content">
+        <h2 id="reset-title">Wertung zurücksetzen?</h2>
+        <p>Die Eingaben in diesem Wertungsmodus werden gelöscht.</p>
+        <div class="dialog-actions">
+          <button class="secondary-button" id="cancel-reset" type="button">Abbrechen</button>
+          <button class="primary-button" id="confirm-reset" type="button">Zurücksetzen</button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog class="app-dialog settings-dialog" id="settings-dialog" aria-labelledby="settings-title">
+      <div class="dialog-handle" aria-hidden="true"></div>
+      <div class="dialog-content">
+        <h2 id="settings-title">Einstellungen</h2>
+        <label class="setting-row" for="haptics-toggle">
+          <span class="setting-copy">
+            <span class="setting-title">Haptisches Feedback</span>
+            <span class="setting-subtitle" id="haptics-description">Kurze Vibration bei Tastendruck</span>
+          </span>
+          <input class="switch-input" id="haptics-toggle" type="checkbox" aria-describedby="haptics-description">
+          <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+        </label>
+        <div class="settings-actions">
+          <button class="secondary-button" id="close-settings" type="button">Schließen</button>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
