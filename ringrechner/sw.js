@@ -1,9 +1,9 @@
-const CACHE_NAME = 'ringrechner-pwa-v8';
+const CACHE_NAME = 'ringrechner-pwa-v9';
 const APP_FILES = [
   './',
   './index.html',
-  './styles.css',
-  './app.js',
+  './assets/app.css',
+  './assets/app.js',
   './manifest.webmanifest',
   './favicon.svg',
   './favicon.png',
@@ -37,25 +37,28 @@ self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(request.url);
   if (requestUrl.origin !== self.location.origin) return;
 
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request)
-        .then((response) => response)
-        .catch(() => caches.match(new URL('./index.html', self.registration.scope).href)),
-    );
-    return;
-  }
-
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((response) => {
-        if (response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+    (async () => {
+      const useCachedResponse = async () => {
+        const cached = await caches.match(request);
+        if (cached) return cached;
+        if (request.mode === 'navigate') {
+          return caches.match(new URL('./index.html', self.registration.scope).href);
         }
-        return response;
-      });
-    }),
+        return null;
+      };
+
+      try {
+        const response = await fetch(request);
+        if (response.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(request, response.clone());
+          return response;
+        }
+        return (await useCachedResponse()) || response;
+      } catch {
+        return (await useCachedResponse()) || Response.error();
+      }
+    })(),
   );
 });
